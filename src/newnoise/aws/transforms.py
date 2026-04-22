@@ -16,8 +16,8 @@ def flatten_prices(price, price_type="on_demand"):
         new_p = {
             "effectiveDateStart": price["effectiveDate"],
             "purchaseOption": price_type,
-            "unit": price_dim["unit"],
-            "description": price_dim["description"],
+            "unit": price_dim.get("unit", ""),
+            "description": price_dim.get("description", ""),
         }
 
         if "beginRange" in price_dim:
@@ -25,14 +25,14 @@ def flatten_prices(price, price_type="on_demand"):
         if "endRange" in price_dim:
             new_p["endUsageAmount"] = price_dim["endRange"]
 
-        ppu = price_dim["pricePerUnit"]
+        ppu = price_dim.get("pricePerUnit", {})
         if "USD" in ppu:
             new_p["USD"] = ppu["USD"]
         elif "CNY" in ppu:
             new_p["CNY"] = ppu["CNY"]
 
         if price_type == "reserved":
-            term_attrs = price["termAttributes"]
+            term_attrs = price.get("termAttributes", {})
             new_p["termLength"] = term_attrs.get("LeaseContractLength", "")
             new_p["termPurchaseOption"] = term_attrs.get("PurchaseOption", "")
             new_p["termOfferingClass"] = term_attrs.get("OfferingClass", "")
