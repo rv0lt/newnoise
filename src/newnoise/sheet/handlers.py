@@ -114,14 +114,17 @@ class EC2HostHandler(BaseInstanceHandler):
 class LoadBalancerHandler(AWSBaseHandler):
     TF = "aws_lb"
 
-    KEY_LBT = "load_balancer_type"
+    KEY_LBT = "values.load_balancer_type"
 
     def match(self, row):
         return (
             super().match(row)
             and matchers.product_servicecode(row, v="AWSELB")
-            and matchers.product_usagetype(row, v="LoadBalancerUsage")
+            and matchers.product_usagetype(row, s="LoadBalancerUsage")
             and matchers.price_purchaseoption(row, v="on_demand")
+
+            and not matchers.product_usagetype(row, s="Outposts-LoadBalancerUsage")
+            and not matchers.product_usagetype(row, s="TS-LoadBalancerUsage")
         )
 
     def process(self, row):
@@ -131,7 +134,7 @@ class LoadBalancerHandler(AWSBaseHandler):
                 self.KEY_LBT: a.product("operation", t=self.t_operation),
             },
             {},
-            a.priced_by_data,
+            a.priced_by_time,
             service_provider="aws",
             tf_resource=self.TF,
             service_class=a.const("data"),
