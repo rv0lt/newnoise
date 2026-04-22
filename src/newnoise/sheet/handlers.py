@@ -149,6 +149,26 @@ class LoadBalancerHandler(AWSBaseHandler):
                 return "gateway"
         return attr
 
+class EKSHandler(AWSBaseHandler):
+    TF = "aws_eks_cluster"
+
+    def match(self, row):
+        return (
+            super().match(row)
+            and matchers.product_servicecode(row, v="AmazonEKS")
+            and matchers.product_usagetype(row, c="AmazonEKS-Hours:perCluster")
+        )
+
+    def process(self, row):
+        return process(
+            row,
+            {},
+            {},
+            a.priced_by_time,
+            service_provider="aws",
+            tf_resource=self.TF,
+            service_class=a.const("cluster"),
+        )
 
 class RDSBaseHandler(AWSBaseHandler):
     """
