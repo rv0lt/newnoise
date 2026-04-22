@@ -6,6 +6,7 @@ HANDLERS = [
     handlers.EC2InstanceHandler(),
     handlers.EC2HostHandler(),
     handlers.LoadBalancerHandler(),
+    handlers.EKSHandler(),
     handlers.RDSInstanceHandler(),
     handlers.RDSIOPSHandler(),
     handlers.RDSStorageHandler(),
